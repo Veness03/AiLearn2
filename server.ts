@@ -21,7 +21,7 @@ let ai: GoogleGenAI | null = null;
 function getAi() {
   if (!ai) {
     ai = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY || "empty-key-for-now",
+      apiKey: process.env.GEMINI_API_KEY1 || process.env.GEMINI_API_KEY || "empty-key-for-now",
       httpOptions: {
         headers: {
           "User-Agent": "aistudio-build",
