@@ -1,0 +1,6 @@
+{
+  "name": "AI Knowledge Challenge",
+  "description": "A premium personalized learning saas platform using Gemini AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
