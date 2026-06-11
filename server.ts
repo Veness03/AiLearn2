@@ -8,15 +8,21 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// Initialize Gemini
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  httpOptions: {
-    headers: {
-      "User-Agent": "aistudio-build",
-    },
-  },
-});
+// Initialize Gemini lazily
+let ai: GoogleGenAI | null = null;
+function getAi() {
+  if (!ai) {
+    ai = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY || "empty-key-for-now",
+      httpOptions: {
+        headers: {
+          "User-Agent": "aistudio-build",
+        },
+      },
+    });
+  }
+  return ai;
+}
 
 // Mock Database (In a real app, use a DB)
 // We will also use client-side local storage or Zustand for saving personal mock data.
@@ -36,8 +42,8 @@ Include:
 6. A brief explanation for every answer.
 Make sure the content is highly educational and accurate.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+    const response = await getAi().models.generateContent({
+      model: "gemini-2.5-flash",
       contents: prompt,
       config: {
         tools: [{ googleSearch: {} } as any],
