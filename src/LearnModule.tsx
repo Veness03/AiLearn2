@@ -61,7 +61,10 @@ export function LearnModule() {
         body: JSON.stringify({ topic: topicString, difficulty: "Medium" })
       });
       
-      if (!res.ok) throw new Error("Failed to formulate content. Our AI might be busy, please try again.");
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        throw new Error(`Generation failed (Status ${res.status}). Our AI might be busy. ${errText ? `Details: ${errText.slice(0, 100)}` : ""}`);
+      }
       
       const payload: TopicData = await res.json();
       
