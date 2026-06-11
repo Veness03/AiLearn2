@@ -138,8 +138,8 @@ Make sure the content is highly educational and accurate.`;
     // Silently handle the error and use mock fallback
     // This prevents the terminal from showing an error stack trace during high model demand
     const mockData = {
-      title: `${req.body.topic} (Mock Fallback)`,
-      summary: `This is a mock overview for the topic "${req.body.topic}". The AI API is currently experiencing a temporary spike in demand (503 UNAVAILABLE), so we have provided this simulated module to allow you to explore the application's interface and features in the meantime. Please try generating a real topic again shortly!`,
+      title: `${req.body.topic} (Missing API Key)`,
+      summary: `I'm currently showing mock data because a valid Gemini API Key was not found or the request failed. To get real AI generation: 1) Get an API key from https://aistudio.google.com/app/apikey 2) Add it to the Settings menu here as GEMINI_API_KEY.`,
       keyConcepts: [
         { concept: "First Principle", description: `The foundational elements that make up the core of ${req.body.topic}.` },
         { concept: "Advanced Mechanics", description: `How the systems interact on a deeper level beyond surface understanding.` },
