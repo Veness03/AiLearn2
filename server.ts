@@ -8,6 +8,14 @@ const PORT = 3000;
 
 app.use(express.json());
 
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true, message: "backend is reachable!" });
+});
+
+app.post("/api/echo", (req, res) => {
+  res.json({ echo: req.body });
+});
+
 // Initialize Gemini lazily
 let ai: GoogleGenAI | null = null;
 function getAi() {
@@ -29,8 +37,10 @@ function getAi() {
 
 // Generate Course Content Endpoint
 app.post("/api/generate-topic", async (req, res) => {
+  console.log("Received request for /api/generate-topic", req.body);
   try {
     const { topic, difficulty = "Medium" } = req.body;
+    console.log("Attempting Gemini AI generation for topic:", topic);
 
     const prompt = `Generate a comprehensive learning module about "${topic}" at a ${difficulty} difficulty level.
 Include:
@@ -42,7 +52,7 @@ Include:
 6. A brief explanation for every answer.
 Make sure the content is highly educational and accurate.`;
 
-    const response = await getAi().models.generateContent({
+    const geminiPromise = getAi().models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
@@ -109,6 +119,13 @@ Make sure the content is highly educational and accurate.`;
       },
     });
 
+    // Timeout after 15 seconds to prevent 504 Gateway Timeout from hanging the user forever.
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Gemini API Request timed out after 15 seconds")), 15000)
+    );
+
+    const response: any = await Promise.race([geminiPromise, timeoutPromise]);
+
     const text = response.text;
     if (!text) {
       throw new Error("No response from model");
@@ -117,6 +134,7 @@ Make sure the content is highly educational and accurate.`;
     const data = JSON.parse(text);
     return res.json(data);
   } catch (error: any) {
+    console.error("Gemini Generation Error:", error.message || error);
     // Silently handle the error and use mock fallback
     // This prevents the terminal from showing an error stack trace during high model demand
     const mockData = {
