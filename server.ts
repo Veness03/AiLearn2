@@ -56,7 +56,6 @@ Make sure the content is highly educational and accurate.`;
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
-        tools: [{ googleSearch: {} } as any],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -119,9 +118,9 @@ Make sure the content is highly educational and accurate.`;
       },
     });
 
-    // Timeout after 15 seconds to prevent 504 Gateway Timeout from hanging the user forever.
+    // Timeout after 60 seconds to prevent Gateway Timeout from hanging the user forever.
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Gemini API Request timed out after 15 seconds")), 15000)
+      setTimeout(() => reject(new Error("Gemini API Request timed out after 60 seconds")), 60000)
     );
 
     const response: any = await Promise.race([geminiPromise, timeoutPromise]);
@@ -138,8 +137,8 @@ Make sure the content is highly educational and accurate.`;
     // Silently handle the error and use mock fallback
     // This prevents the terminal from showing an error stack trace during high model demand
     const mockData = {
-      title: `${req.body.topic} (Missing API Key)`,
-      summary: `I'm currently showing mock data because a valid Gemini API Key was not found or the request failed. To get real AI generation: 1) Get an API key from https://aistudio.google.com/app/apikey 2) Add it to the Settings menu here as GEMINI_API_KEY.`,
+      title: `${req.body.topic} (Mock Fallback)`,
+      summary: `Generation failed. If you are on Vercel, make sure to add GEMINI_API_KEY in your Vercel Project Settings. Error details: ${error.message || error}`,
       keyConcepts: [
         { concept: "First Principle", description: `The foundational elements that make up the core of ${req.body.topic}.` },
         { concept: "Advanced Mechanics", description: `How the systems interact on a deeper level beyond surface understanding.` },
