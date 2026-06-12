@@ -32,7 +32,6 @@ Make sure the content is highly educational and accurate.`;
       model: "gemini-2.5-flash",
       contents: prompt,
       config: {
-        tools: [{ googleSearch: {} } as any],
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -96,7 +95,7 @@ Make sure the content is highly educational and accurate.`;
     });
 
     const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("Gemini API Request timed out after 15 seconds")), 15000)
+      setTimeout(() => reject(new Error("Gemini API Request timed out after 60 seconds")), 60000)
     );
 
     const response: any = await Promise.race([geminiPromise, timeoutPromise]);
@@ -111,8 +110,8 @@ Make sure the content is highly educational and accurate.`;
     
     // Mock fallback if AI is rate limited or timeouts
     const mockData = {
-      title: `${req.body.topic} (Mock Fallback)`,
-      summary: `This is a mock overview for the topic "${req.body.topic}". The AI API is currently experiencing a temporary spike in demand (503 UNAVAILABLE), so we have provided this simulated module to allow you to explore the application's interface and features in the meantime. Please try generating a real topic again shortly!`,
+      title: `${req.body.topic} (Missing API Key)`,
+      summary: `Generation failed. If you are on Vercel, make sure to add GEMINI_API_KEY in your Vercel Project Settings. Error details: ${error.message || error}`,
       keyConcepts: [
         { concept: "First Principle", description: `The foundational elements that make up the core of ${req.body.topic}.` },
         { concept: "Advanced Mechanics", description: `How the systems interact on a deeper level beyond surface understanding.` },
